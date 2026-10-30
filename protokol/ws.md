@@ -30,7 +30,7 @@ Brak pola `proto`: BE zgaduje możliwości po `firmware`. **Do zrobienia w etapi
 
 ### 1.2 Kanał szyfrowany (`wsenc.js` ↔ `ws_enc.cpp`)
 
-- `shared = ECDH(BE_priv, node_pub).x` (secp256k1, 32 B).
+- `shared = ECDH(BE_priv, node_pub).x` (secp256k1, 32 B). Klucz publiczny BE nod ma wbudowany w FW; BE zna klucz noda z rejestracji.
 - `okm = HKDF-SHA256(shared, salt = enonce_fw ‖ enonce_be, info = "sensmos-ws-v1", 32)`.
 - Klucz nod→BE = `okm[0:16]`, BE→nod = `okm[16:32]`.
 - Ramka binarna: `ver(1) ‖ seq(8, BE) ‖ tag(16) ‖ ciphertext`, AES-128-GCM, `IV = 0x00000000 ‖ seq`, `AAD = ver ‖ seq`.
