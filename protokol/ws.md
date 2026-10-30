@@ -20,13 +20,14 @@ Ten plik jest źródłem prawdy (plan przebudowy, etap 2). Zmiana w kodzie bez z
 | `enc` | 1 | żądanie kanału szyfrowanego (FW ≥ 0.61) |
 | `enonce` | hex 32 | połowa soli klucza sesji od noda |
 | `firmware` | str | wersja FW |
+| `proto` | int? | wersja tego protokołu; brak = 0. BE odmawia `update_required` poniżej `PROTO_MIN` (domyślnie 0). FW 1.10 wysyła 1 |
 | `remote` | 1? | nod sparowany z telefonem (może otworzyć tunel) |
 | `lora` | 1? | SX1262 wykryty przy starcie |
 | `board` | str? | nazwa wykrytej płytki LoRa |
 | `chip` | str | `<model> r<rev> @<MHz>MHz <MB>MB` |
 
 Odpowiedź `identified` zawiera połowę soli BE; od niej obie strony mówią wyłącznie ramkami szyfrowanymi (1.2).
-Brak pola `proto`: BE zgaduje możliwości po `firmware`. **Do zrobienia w etapie 2:** pole `proto` (liczba), BE odmawia `update_required` poniżej minimum.
+Pole `proto` zastępuje zgadywanie możliwości po `firmware`.
 
 ### 1.2 Kanał szyfrowany (`wsenc.js` ↔ `ws_enc.cpp`)
 

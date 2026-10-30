@@ -1,6 +1,6 @@
 {
   "_opis": "Wiadomości nod → BE (protokol/ws.md §2). Pole z '?' jest opcjonalne. Dodatkowe pola są dozwolone. Typy: string, number, boolean, array, object, any. Kopia w backend/src/data/ws-schema.json musi być identyczna (test backend/test/ws_schema.test.js).",
-  "identify": { "device_id": "string", "timestamp": "number", "msg": "string", "signature": "string", "enc?": "number", "enonce?": "string", "firmware": "string", "remote?": "number", "lora?": "number", "board?": "string", "chip?": "string" },
+  "identify": { "device_id": "string", "timestamp": "number", "msg": "string", "signature": "string", "enc?": "number", "enonce?": "string", "firmware": "string", "proto?": "number", "remote?": "number", "lora?": "number", "board?": "string", "chip?": "string" },
   "ping": { "device_id": "string", "free": "number", "largest": "number", "q_lag?": "number", "q_busy?": "number", "q_depth?": "number", "q_wait?": "number" },
   "batch": { "device_id": "string", "owner_address?": "string", "timestamp": "number", "firmware": "string" },
   "mon_batch": { "device_id": "string", "owner_address?": "string", "timestamp": "number", "firmware": "string", "entities": "array" },
