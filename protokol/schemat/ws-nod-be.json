@@ -4,7 +4,7 @@
   "ping": { "device_id": "string", "free": "number", "largest": "number", "q_lag?": "number", "q_busy?": "number", "q_depth?": "number", "q_wait?": "number" },
   "batch": { "device_id": "string", "owner_address?": "string", "timestamp": "number", "firmware": "string" },
   "mon_batch": { "device_id": "string", "owner_address?": "string", "timestamp": "number", "firmware": "string", "entities": "array" },
-  "message": { "from": "string", "to": "string", "eid": "string", "timestamp": "number", "payload?": "string" },
+  "message": { "to": "string", "from?": "string", "eid?": "string", "timestamp?": "number", "payload?": "string" },
   "push": { "push_title": "string", "push_body": "string" },
   "node_config": { "gps_lat?": "any", "gps_lon?": "any", "fuzz?": "boolean", "location_mode?": "string" },
   "check_assign": {},
