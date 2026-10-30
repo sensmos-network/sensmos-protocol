@@ -112,5 +112,5 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 
 ## 4. Kierunek po przebudowie
 
-- Etap 2: pole `proto`, schemat JSON każdego typu w `protokol/schemat/`, BE odrzuca ramkę spoza schematu z logiem.
+- Etap 2: schemat wiadomości nod → BE w `protokol/schemat/ws-nod-be.json` (zrobione 2026-10-30; BE `services/ws_schema.js` loguje niezgodne ramki, `WS_SCHEMA_ENFORCE=1` je odrzuca). Pole `proto` w `identify`.
 - Etap 4: raporty pomiarowe (`check_result`, `checknow_result`, `monitor_*`, wynik punch, trace) zbiegają się w jedną wiadomość `measure` (plan, rozdz. 2). Stare typy obsługuje adapter do wydania FW 1.10 na całej flocie.
