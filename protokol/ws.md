@@ -82,7 +82,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | Co | Skutek | Naprawa |
 |---|---|---|
 | FW wysyła `event` (`script_actions.cpp:379`, UserScript „wyślij do noda”), BE nie ma handlera | BE odpowiada `unknown type`, akcja skryptu nigdy nie dociera | naprawione w kodzie FW 2026-10-30 (`message` przez ArduinoJson; przy okazji payload był wklejany bez escapowania), trafi do floty z FW 1.10 |
-| BE obsługuje `wallet_request`, `user_script_fired` | żaden FW ich nie wysyła | wyrzucić z BE (etap 3) |
+| BE obsługiwał `wallet_request`, `user_script_fired` | żaden FW ich nie wysyła | wyrzucone z BE 2026-10-30 (etap 3) |
 
 ## 3. BE → nod (31 typów w `WS_TABLE`)
 
