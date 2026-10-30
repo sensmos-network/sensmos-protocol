@@ -6,6 +6,8 @@ Jedno źródło prawdy dla formatów, które implementują FW (C++), backend (JS
 |---|---|---|
 | `ws.md` | WS nod ↔ BE: katalog wiadomości, kanał szyfrowany | `wektory/ws-enc.json` |
 | `tunel.md` | tunel v2 telefon ↔ nod | `wektory/tunel-v2.json` |
+| (ldev.js / kom_frames.dart) | ramki LoRa E0 04 urządzeń i komunikatora | `wektory/ldev-e004.json` (gen: `backend/tools/ldev_fixture.js`) |
+| (store_box.js / sensmos_store) | skrzynka Store | `wektory/store-box.json` (gen: `backend/tools/box_fixture.js`) |
 
 Symulator noda: `backend/tools/nodesim.js` (identify, kanał szyfrowany, ping, checknet); test `backend/test/nodesim.test.js`.
 
