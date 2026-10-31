@@ -11,7 +11,7 @@ czujnika, odbiór LoRa) jest zapisywany w BE jako jeden rekord w tabeli `measure
 |---|---|---|
 | `ts` | liczba (s od 1970) | kiedy nod zmierzył; brak = czas odbioru w BE |
 | `kind` | tekst ≤ 24 | rodzaj, tabela niżej |
-| `target` | tekst ≤ 64, opcjonalne | cel: host kotwicy, id8 peera, id encji czujnika |
+| `target` | tekst ≤ 64, opcjonalne | cel: dla `net.*` dokładnie `host` z przydzielonego joba (adres kotwicy albo IP peera — BE dopina z joba pozycję i region celu), dla czujnika id encji |
 | `tk` | tekst | rodzaj celu: `target` (kotwica), `peer`, `gateway` (własna brama/router), `monitor`, `sensor` |
 | `ok` | bool | czy pomiar się udał |
 | `rtt` | liczba ms, opcjonalne | czas odpowiedzi (mediana z próbek) |
@@ -38,6 +38,8 @@ BE dopisuje sam: `device_id` (z sesji), `asn` (z IP noda, lokalna baza ASN; IP n
 ```json
 { "type": "measure", "v": 1, "m": [ { "ts": 1761900000, "kind": "net.icmp", "target": "1.1.1.1", "tk": "target", "ok": true, "rtt": 12.4, "loss": 0, "n": 4 } ] }
 ```
+
+BE przelicza rekordy `net.*` na wyniki checknetu (`measure/checknet.toResults`), więc `measure` daje to samo co `check_result`: bandy na mapie, podgląd na żywo, rejestr blokad ICMP. Czego jeszcze brakuje do przejścia FW: pola trasy (`lh_host`, `geo_ok`, `hops`, `trace_ip`) — do dopisania jako opcjonalne przed FW 1.10.
 
 Najwyżej 64 rekordy w wiadomości; rekord z nieznanym `kind` albo bez `ok` jest pomijany (licznik
 w logu), reszta wiadomości wchodzi. Do czasu FW, który wysyła `measure`, stare wiadomości
