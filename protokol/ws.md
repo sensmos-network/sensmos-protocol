@@ -54,6 +54,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | `node_config` | `http_config.cpp:66,79,92` | `onNodeConfig` | `gps_lat`,`gps_lon`,`fuzz` / `fuzz` / `location_mode` |
 | `check_assign` | `checknet.cpp:332` | `onCheckAssign` | — (prośba o joby) |
 | `check_result` | `checknet.cpp:186`, `punch.cpp:174` | `onCheckResult` | `results[]` (`id`,`kind`,`host`,…) |
+| `measure` | (FW 1.10) | `onMeasure` → `measure/store.record` | `v`, `m[]` — rekordy z `measure.md` |
 | `checknow_result` | `checknow.cpp:97` | `onChecknowResult` | `id`,`ok`,`rtt_ms`,`status` |
 | `monitor_alert` | `monitors.cpp:86` | `onMonitorAlert` | `id`,`state`,`last_ms`,`fails` |
 | `monitor_report` | `monitors.cpp:115` | `onMonitorReport` | `id`,`bucket`,`ok`,`fail`,… |

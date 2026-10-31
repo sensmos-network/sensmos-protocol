@@ -9,6 +9,7 @@
   "node_config": { "gps_lat?": "any", "gps_lon?": "any", "fuzz?": "boolean", "location_mode?": "string" },
   "check_assign": {},
   "check_result": { "results": "array" },
+  "measure": { "v": "number", "m": "array" },
   "checknow_result": { "id": "string", "ok": "boolean", "rtt_ms": "number", "status": "number", "ip?": "string", "dns_ms?": "number", "tcp_ms?": "number", "ttfb_ms?": "number" },
   "monitor_alert": { "id": "number", "state": "string", "last_ms": "number", "fails": "number", "reason?": "string" },
   "monitor_report": { "id": "number", "bucket": "number", "ok": "number", "fail": "number", "p50": "number", "p95": "number", "ttfb_p50": "number", "samples": "number" },
