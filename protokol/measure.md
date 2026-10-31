@@ -19,6 +19,7 @@ czujnika, odbiór LoRa) jest zapisywany w BE jako jeden rekord w tabeli `measure
 | `loss` | liczba 0–100, opcjonalne | straty pakietów w % |
 | `n` | liczba, opcjonalne | liczba próbek |
 | `val` | liczba, opcjonalne | wartość (czujnik, RSSI dBm dla `net.wifi`) |
+| `x` | obiekt, opcjonalne | pola rodzaju, przekazywane do checknetu bez zmian: pozycja celu (`to_region`, `to_lat`, `to_lon`), HTTP (`status_code`, `ttfb_ms`), DNS (`resolved_ip`, `match`), trasa (`lh_host`, `geo_ok`, `reached`, `hops[]`, `trace_ip`) |
 
 BE dopisuje sam: `device_id` (z sesji), `asn` (z IP noda, lokalna baza ASN; IP nie jest zapisywane),
 `region` (kraj noda, ISO2), `src` (skąd przyszło: `measure`, `check_result`, …).
@@ -27,6 +28,7 @@ BE dopisuje sam: `device_id` (z sesji), `asn` (z IP noda, lokalna baza ASN; IP n
 |---|---|
 | `net.icmp`, `net.dns`, `net.tcp`, `net.http` | pomiar łącza do celu (`tk` = `target` albo `peer`) |
 | `net.punch` | UDP nod↔nod (`tk` = `peer`) |
+| `net.trace` | trasa do celu (hopy w `x.hops`) |
 | `net.lan` | hop do własnej bramy (`tk` = `gateway`) — filtr złego łącza domowego |
 | `net.wifi` | RSSI WiFi noda w `val` |
 | `net.monitor` | monitor R3 (`tk` = `monitor`) |
@@ -39,7 +41,7 @@ BE dopisuje sam: `device_id` (z sesji), `asn` (z IP noda, lokalna baza ASN; IP n
 { "type": "measure", "v": 1, "m": [ { "ts": 1761900000, "kind": "net.icmp", "target": "1.1.1.1", "tk": "target", "ok": true, "rtt": 12.4, "loss": 0, "n": 4 } ] }
 ```
 
-BE przelicza rekordy `net.*` na wyniki checknetu (`measure/checknet.toResults`), więc `measure` daje to samo co `check_result`: bandy na mapie, podgląd na żywo, rejestr blokad ICMP. Czego jeszcze brakuje do przejścia FW: pola trasy (`lh_host`, `geo_ok`, `hops`, `trace_ip`) — do dopisania jako opcjonalne przed FW 1.10.
+BE przelicza rekordy `net.*` na wyniki checknetu (`measure/checknet.toResults`), więc `measure` daje to samo co `check_result`: bandy na mapie, podgląd na żywo, rejestr blokad ICMP. FW z `proto` 2 (checknet, punch) wysyła już tylko `measure`.
 
 Najwyżej 64 rekordy w wiadomości; rekord z nieznanym `kind` albo bez `ok` jest pomijany (licznik
 w logu), reszta wiadomości wchodzi. Do czasu FW, który wysyła `measure`, stare wiadomości
