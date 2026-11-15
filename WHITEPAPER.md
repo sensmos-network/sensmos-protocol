@@ -5,7 +5,7 @@
 **A decentralized sensor network that measures the real world, hands the data back to the people who produce it, and rewards real physical contribution with the GALU token.**
 
 > Version 1.0 · GALU on Polygon · Contract [`0x9d797D0E642D9EADdbDbD34ACFCFd07bf0043c6C`](https://polygonscan.com/token/0x9d797D0E642D9EADdbDbD34ACFCFd07bf0043c6C)
-> This document is descriptive, not financial advice. Parameters quoted are the deployed values and may be tuned by the operator (see §6, §10).
+> This document is descriptive, not financial advice. GALU is a utility token for Sensmos services (see §6a). Parameters quoted are the deployed values and may be tuned by the operator (see §6, §10).
 
 ---
 
@@ -118,21 +118,21 @@ Maximum ≈ 2.31× (full uptime, sole node on its uplink); a node stacked in a c
 |--------|-----------|---------------|
 | **mint** | fresh emission up to the hard cap (bootstrap) | yes |
 | **recycle** | in-network spending (queries, subscriptions, messages) re-allocated back to the pool | no |
-| **external** (`fundPool`) | revenue (e.g. data sales) used to buy GALU on the market and fund the pool | **no** |
+| **external** (`fundPool`) | revenue from paid services (e.g. data, monitoring) moved into the pool as existing GALU | **no** |
 
 Recycle and external land in one **reserve**; only ~5% of it drips into rewards each epoch, smoothing spikes. The single outflow is **claim**.
 
 ### Cumulative claims
 Rewards are distributed as a **cumulative Merkle drop**: the root encodes each address's *lifetime* entitlement; the contract tracks how much was already claimed and pays the difference. One transaction collects the whole backlog, double-claims are impossible by construction, and a skipped on-chain submit self-heals on the next epoch.
 
-### Lifecycle & "real yield"
+### Lifecycle
 | Phase | Condition | Reward source |
 |-------|-----------|---------------|
 | Ramp | < THRESHOLD nodes | mostly fresh mint |
 | Decay | > THRESHOLD nodes | mint (capped) + drip |
 | Post-cap | hard cap minted | recycle + **revenue (fundPool)** |
 
-After the cap there is no inflation. An active, revenue-generating network keeps paying rewards out of recycled spending and bought-back tokens — *real yield* backed by real value, creating buy pressure rather than dilution. A dead network with no revenue simply dries up to zero.
+After the cap there is no new issuance. An active network keeps paying rewards out of GALU spent on its services and revenue routed into the pool through `fundPool`. A network nobody uses simply dries up to zero.
 
 ---
 
@@ -152,9 +152,24 @@ After the cap there is no inflation. An active, revenue-generating network keeps
 | Min / max pings | 16 / 96 per epoch (≈4 h online to qualify) | backend config |
 | Counted nodes | trusted (attested) only | anti-sybil |
 
-Backend-config values are tunable live and can taper over time (the nominal amount matters less than value — emission can be reduced as the network and token price grow). The two contract constants (cap, per-epoch mint) are immutable.
+Backend-config values are tunable live and can taper over time (emission can be reduced as the network grows). The two contract constants (cap, per-epoch mint) are immutable.
 
 **Team (Model B).** The 5% team share is *part of the pool*, sits in the Merkle tree as an ordinary address, and is claimed like a node — there is no separate mint on top.
+
+---
+
+## 6a. What GALU is for
+
+GALU is a **utility token for the Sensmos network**. It exists to pay for things the network already does today:
+
+- data subscriptions between nodes (`sub.*`), billed daily;
+- Sensmos Store storage packages;
+- LoRa network services (gateway, messaging, emergency features), billed per day of use;
+- in-network queries and messages.
+
+Running a node, a Hub or a Home Assistant / ESPHome bridge is rewarded in GALU so that contributors can use these services. The wallet in the Sensmos app is **self-custody**: the key is created on your phone (with an optional backup on your own node) and Sensmos never holds it.
+
+What GALU is **not**: the operator does not sell GALU, does not run an exchange, does not offer to buy it back from users and does not seek its admission to trading on any exchange. GALU gives no right to profits, dividends, interest, voting, redemption or any claim against the operator. Nothing in this document is a promise about its price.
 
 ---
 
@@ -188,15 +203,15 @@ Backend-config values are tunable live and can taper over time (the nominal amou
 
 1. **Live (now).** Contract deployed and verified on Polygon; daily epochs minting and publishing cumulative roots; firmware, app, HA integration and protocol docs open-source. The ambient network mesh (node↔node ICMP + TCP/DNS/HTTP probes) runs fleet-wide and feeds the live map.
 2. **Growth.** Onboard real nodes, harden the demand side (data marketplace / external revenue → `fundPool`), polish the consumer experience.
-3. **Network intelligence.** Turn the measurement mesh into **directed monitoring** — watch *your own* endpoint from many countries at once (uptime, TTFB, DNS answers, alerting via push/webhook/e-mail, public status pages). The directed-monitoring engine (region-targeted assignments, redundancy quorum, per-country rollups, alerts) already runs in production. Client revenue funds the pool through the `fundPool` buyback path (§5) and is distributed to **all** nodes through the standard epoch weights — vantage rarity is already priced by the coverage ladder, so there are no per-probe payouts to game. Opening this to outside customers is hard-gated behind two safeguards: cryptographically **signed probe jobs** (nodes only execute what the backend signed) and **target-ownership verification** — the network will only ever probe what a customer proves they control.
+3. **Network intelligence.** Turn the measurement mesh into **directed monitoring** — watch *your own* endpoint from many countries at once (uptime, TTFB, DNS answers, alerting via push/webhook/e-mail, public status pages). The directed-monitoring engine (region-targeted assignments, redundancy quorum, per-country rollups, alerts) already runs in production. Client revenue funds the pool through `fundPool` (§5) and is distributed to **all** nodes through the standard epoch weights — vantage rarity is already priced by the coverage ladder, so there are no per-probe payouts to game. Opening this to outside customers is hard-gated behind two safeguards: cryptographically **signed probe jobs** (nodes only execute what the backend signed) and **target-ownership verification** — the network will only ever probe what a customer proves they control.
 4. **Trust hardening.** Owner → multisig + timelock, external audit, public reward datasets + monitoring.
-5. **Verifiability.** Move the reward oracle from "trusted" toward "challengeable / provable" as total value justifies the engineering.
+5. **Verifiability.** Move the reward oracle from "trusted" toward "challengeable / provable" as the network grows.
 
 ---
 
 ## 10. Risk factors & disclaimer
 
-GALU is an in-network reward token, not an investment instrument; nothing here is a promise of value or return. The economy is early and parameters may change. Key risks: the trusted-minter model until hardening completes (§7); on-chain key compromise; smart-contract risk pending audit; regulatory uncertainty around tokens; and dependence on continued operation of the backend during the centralized phase. The firmware and Home Assistant integration work fully locally and require none of the token layer.
+GALU is a utility token used to pay for Sensmos services (§6a), not an investment instrument; nothing here is a promise of value, price or return. The operator does not sell GALU and does not seek its listing. The economy is early and parameters may change. Key risks: the trusted-minter model until hardening completes (§7); on-chain key compromise; smart-contract risk pending audit; regulatory uncertainty around tokens; and dependence on continued operation of the backend during the centralized phase. The firmware and Home Assistant integration work fully locally and require none of the token layer.
 
 ---
 

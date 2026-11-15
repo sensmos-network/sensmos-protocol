@@ -22,7 +22,7 @@ Contract: [`SensmosRewardPool.sol`](SensmosRewardPool.sol) · deployed on **Poly
 |--------|------|---------------|------|
 | **mint** (`mintEpoch`) | fresh GALU, up to `MAX_SUPPLY` | yes (bootstrap) | **foundation — always minted up to the cap** |
 | **recycle** | in-network spending (query / subscription / message) | no | into the reserve → 5% drip |
-| **external** (`fundPool`) | revenue (e.g. data sales) → GALU bought on the market | **no** | into the reserve → 5% drip |
+| **external** (`fundPool`) | revenue from paid services → existing GALU moved into the pool | **no** | into the reserve → 5% drip |
 
 Outflows: **claim** (reward withdrawal) and **deposit** (a user adds their own GALU to spend in the network).
 
@@ -124,7 +124,7 @@ mass:            balanceOf ≥ Σ(leaf_i − claimedTotal_i)              # cove
 | Decay | trusted > 4000 | 40k (ceiling) | mint + drip (per-node shrinks: 40k/nodes + bonus) |
 | Post-cap | minted = 40M | **0** | drip only (recycle + external) |
 
-After the cap, the network lives on recycle and `fundPool` revenue — "real yield": rewards backed by real value, buy pressure on GALU, zero inflation. A dead network with no revenue → rewards → 0.
+After the cap, the network lives on recycle and `fundPool` revenue, with no new issuance. A network nobody uses → rewards → 0.
 
 ## 10. Anti-sybil
 
@@ -133,5 +133,5 @@ Only **trusted** nodes (BLE attestation ceremony) with `≥ MIN_PINGS` count tow
 ## 11. Audit plan
 
 - **Now (testnet/launch):** OpenZeppelin-based contract, tests (double-claim, cap, solvency guard, mint breaker, catch-up, `Σleaves == totalEntitlement` precision, minimum uptime, access control), attestation on.
-- **Before mainnet value:** owner → multisig (Gnosis Safe) + timelock, audit, Polygonscan verification.
+- **Hardening (next):** owner → multisig (Gnosis Safe) + timelock, audit, Polygonscan verification.
 - **What an auditor attacks:** solvency (guard + balanceOf), inflation (mint breaker + cap), root trust (public leaves + guard), sybil (trusted + minimum uptime), double-spend (`available − claimed`, no credit).

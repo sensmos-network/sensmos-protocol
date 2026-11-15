@@ -52,8 +52,8 @@ Rounding dust stays in the pool.
 
 - **mint** — fresh, up to 40M, always full until the cap is reached (bootstrap).
 - **recycle** — node spending (query/sub/msg) returns to the reserve → 5% drip.
-- **external (`fundPool`)** — revenue (data sales) → GALU bought on the market → reserve → 5% drip.
-  Note: external is GALU that already exists (previously minted, bought on the market) — not a new mint.
+- **external (`fundPool`)** — revenue from paid services → existing GALU moved into the reserve → 5% drip.
+  Note: external is GALU that already exists (previously minted) — not a new mint.
 
 ## 6. On-chain mint (catch-up + mint breaker)
 

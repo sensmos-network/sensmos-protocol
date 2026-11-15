@@ -5,7 +5,7 @@
 **Zdecentralizowana sieć czujników, która mierzy realny świat, oddaje dane ludziom, którzy je wytwarzają, i nagradza realny fizyczny wkład tokenem GALU.**
 
 > Wersja 1.0 · GALU na Polygonie · Kontrakt [`0x9d797D0E642D9EADdbDbD34ACFCFd07bf0043c6C`](https://polygonscan.com/token/0x9d797D0E642D9EADdbDbD34ACFCFd07bf0043c6C)
-> Dokument opisowy, nie porada finansowa. Podane parametry to wartości wdrożone i mogą być strojone przez operatora (patrz §6, §10).
+> Dokument opisowy, nie porada finansowa. GALU to token użytkowy do usług Sensmosa (patrz §6a). Podane parametry to wartości wdrożone i mogą być strojone przez operatora (patrz §6, §10).
 
 ---
 
@@ -118,21 +118,21 @@ Maksimum ≈ 2,14× (pełny uptime, jedyny node na łączu); node stłoczony w z
 |--------|-------|-----------|
 | **mint** | świeża emisja do hard capa (bootstrap) | tak |
 | **recycle** | wydatki w sieci (query, subskrypcje, wiadomości) wracające do puli | nie |
-| **external** (`fundPool`) | przychód (np. sprzedaż danych) → kupione GALU z rynku → pula | **nie** |
+| **external** (`fundPool`) | przychód z płatnych usług (np. dane, monitoring) przeniesiony do puli jako istniejące GALU | **nie** |
 
 Recycle i external lądują w jednej **rezerwie**; tylko ~5% dolewane jest do nagród co epokę, wygładzając skoki. Jedyne wyjście to **claim**.
 
 ### Wypłaty cumulative
 Nagrody rozdawane są jako **cumulative Merkle drop**: root koduje *lifetime* entitlement adresu, kontrakt śledzi ile już odebrano i wypłaca różnicę. Jedna transakcja odbiera całą zaległość, podwójne claimy są niemożliwe z konstrukcji, a pominięty submit on-chain leczy się sam w kolejnej epoce.
 
-### Cykl życia i „real yield"
+### Cykl życia
 | Faza | Warunek | Źródło nagród |
 |------|---------|---------------|
 | Rampa | < THRESHOLD nodów | głównie świeży mint |
 | Decay | > THRESHOLD nodów | mint (capnięty) + dolewka |
 | Post-cap | wymintowany hard cap | recycle + **przychód (fundPool)** |
 
-Po cap nie ma inflacji. Aktywna, przychodowa sieć dalej płaci nagrody z recyklu wydatków i odkupionych tokenów — *real yield* pokryty realną wartością, presja kupna zamiast rozwodnienia. Martwa sieć bez przychodu po prostu schnie do zera.
+Po cap nie ma nowej emisji. Aktywna sieć dalej płaci nagrody z GALU wydanych na jej usługi i z przychodu przeniesionego do puli przez `fundPool`. Sieć, z której nikt nie korzysta, po prostu schnie do zera.
 
 ---
 
@@ -152,9 +152,24 @@ Po cap nie ma inflacji. Aktywna, przychodowa sieć dalej płaci nagrody z recykl
 | Min / max pingów | 16 / 96 na epokę (kwalifikacja ≈ 4 h online) | konfig. BE |
 | Liczone nody | tylko trusted (poświadczone) | anty-sybil |
 
-Wartości z konfigu BE są strojone na żywo i mogą taperować w czasie (nominalna kwota znaczy mniej niż wartość — emisję można zmniejszać wraz ze wzrostem sieci i ceny tokena). Dwie stałe kontraktu (cap, sufit mintu) są niezmienne.
+Wartości z konfigu BE są strojone na żywo i mogą taperować w czasie (emisję można zmniejszać wraz ze wzrostem sieci). Dwie stałe kontraktu (cap, sufit mintu) są niezmienne.
 
 **Team (Model B).** 5% dla teamu jest *częścią puli*, siedzi w drzewie Merkle jako zwykły adres i jest claimowane jak node — bez osobnego mintu na wierzchu.
+
+---
+
+## 6a. Do czego służy GALU
+
+GALU to **token użytkowy sieci Sensmos**. Służy do płacenia za to, co sieć robi już dziś:
+
+- subskrypcje danych między nodami (`sub.*`), rozliczane dobowo;
+- pakiety miejsca w Sensmos Store;
+- usługi sieci LoRa (bramka, komunikator, funkcje alarmowe), rozliczane za dzień użycia;
+- zapytania i wiadomości w sieci.
+
+Za prowadzenie noda, Huba albo mostu Home Assistant / ESPHome dostaje się GALU, żeby móc z tych usług korzystać. Portfel w apce Sensmos jest **niepowierzający**: klucz powstaje w telefonie (z opcjonalną kopią na własnym nodzie), a Sensmos nigdy go nie ma.
+
+Czym GALU **nie jest**: operator nie sprzedaje GALU, nie prowadzi giełdy, nie oferuje odkupu od użytkowników i nie zabiega o dopuszczenie GALU do obrotu na żadnej giełdzie. GALU nie daje prawa do zysków, dywidendy, odsetek, głosu, wykupu ani żadnego roszczenia wobec operatora. Nic w tym dokumencie nie jest obietnicą co do ceny.
 
 ---
 
@@ -188,15 +203,15 @@ Wartości z konfigu BE są strojone na żywo i mogą taperować w czasie (nomina
 
 1. **Live (teraz).** Kontrakt wdrożony i zweryfikowany na Polygonie; dobowe epoki mintują i publikują cumulative rooty; firmware, apka, integracja HA i dokumentacja protokołu open-source. Ambientowa siatka pomiarowa (node↔node ICMP + sondy TCP/DNS/HTTP) działa na całej flocie i zasila żywą mapę.
 2. **Wzrost.** Onboarding realnych nodów, utwardzenie strony popytowej (marketplace danych / przychód → `fundPool`), dopieszczenie UX konsumenckiego.
-3. **Network intelligence (w budowie — „Sensmos Watch").** Zamiana siatki pomiarowej w produkt: **monitoring kierowany** — obserwuj *własny* serwer z wielu krajów naraz (uptime, TTFB, odpowiedzi DNS, alerty push/webhook/e-mail, publiczne strony statusu). Silnik monitoringu kierowanego (przydziały per region, kworum redundancji, rollupy per kraj, alerty) działa już produkcyjnie; powstaje opakowanie produktowe. Przychód od klientów zasila pulę torem buybacku `fundPool` (§5) i jest dystrybuowany do **wszystkich** nodów standardowymi wagami epoki — rzadkość vantage wycenia już drabina scarcity, więc nie ma wypłat per sonda, których dałoby się farmić. Otwarcie na klientów zewnętrznych jest twardo bramkowane dwoma zabezpieczeniami: kryptograficznie **podpisane joby sond** (node wykonuje tylko to, co podpisał backend) oraz **weryfikacja własności celu** — sieć sonduje wyłącznie to, czego kontrolę klient udowodni.
+3. **Network intelligence (w budowie — „Sensmos Watch").** Zamiana siatki pomiarowej w produkt: **monitoring kierowany** — obserwuj *własny* serwer z wielu krajów naraz (uptime, TTFB, odpowiedzi DNS, alerty push/webhook/e-mail, publiczne strony statusu). Silnik monitoringu kierowanego (przydziały per region, kworum redundancji, rollupy per kraj, alerty) działa już produkcyjnie; powstaje opakowanie produktowe. Przychód od klientów zasila pulę przez `fundPool` (§5) i jest dystrybuowany do **wszystkich** nodów standardowymi wagami epoki — rzadkość vantage wycenia już drabina scarcity, więc nie ma wypłat per sonda, których dałoby się farmić. Otwarcie na klientów zewnętrznych jest twardo bramkowane dwoma zabezpieczeniami: kryptograficznie **podpisane joby sond** (node wykonuje tylko to, co podpisał backend) oraz **weryfikacja własności celu** — sieć sonduje wyłącznie to, czego kontrolę klient udowodni.
 4. **Utwardzenie zaufania.** Owner → multisig + timelock, audyt zewnętrzny, publiczne zbiory danych nagród + monitoring.
-5. **Weryfikowalność.** Przesunięcie oracle nagród z „zaufanego" ku „challengeable / dowodliwemu", gdy wartość to uzasadni.
+5. **Weryfikowalność.** Przesunięcie oracle nagród z „zaufanego" ku „challengeable / dowodliwemu", gdy sieć urośnie.
 
 ---
 
 ## 10. Czynniki ryzyka i zastrzeżenie
 
-GALU to token nagrodowy w sieci, nie instrument inwestycyjny; nic tu nie jest obietnicą wartości ani zwrotu. Ekonomia jest wczesna i parametry mogą się zmieniać. Kluczowe ryzyka: model zaufanego mintera do czasu utwardzenia (§7); kompromitacja klucza on-chain; ryzyko smart-kontraktu przed audytem; niepewność regulacyjna wokół tokenów; oraz zależność od działania backendu w fazie scentralizowanej. Firmware i integracja Home Assistant działają w pełni lokalnie i nie wymagają warstwy tokenowej.
+GALU to token użytkowy do płacenia za usługi Sensmosa (§6a), nie instrument inwestycyjny; nic tu nie jest obietnicą wartości, ceny ani zwrotu. Operator nie sprzedaje GALU i nie zabiega o jego notowanie. Ekonomia jest wczesna i parametry mogą się zmieniać. Kluczowe ryzyka: model zaufanego mintera do czasu utwardzenia (§7); kompromitacja klucza on-chain; ryzyko smart-kontraktu przed audytem; niepewność regulacyjna wokół tokenów; oraz zależność od działania backendu w fazie scentralizowanej. Firmware i integracja Home Assistant działają w pełni lokalnie i nie wymagają warstwy tokenowej.
 
 ---
 
