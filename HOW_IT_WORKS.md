@@ -44,7 +44,7 @@ Mint is the foundation; recycle and data sales add a bonus. Early nodes get mint
 ```
 team      = pool × 5%             (Model B — from the pool, in the Merkle tree like a normal address)
 node_pool = pool − team
-reward_i  = node_pool × (weight_i / Σweights)   # a share; MAY exceed BASE (turnover premium)
+share_i   = node_pool × (weight_i / Σweights)   # a share; MAY exceed BASE (turnover premium)
 ```
 Rounding dust stays in the pool.
 
@@ -80,13 +80,13 @@ One transaction collects the whole backlog. Proofs are served only from an epoch
 
 ## 9. Lifecycle phases
 
-| Phase | Condition | fresh_mint | Pool / reward |
+| Phase | Condition | fresh_mint | Pool / allocation |
 |-------|-----------|-----------|---------------|
-| Ramp | < 4000 nodes | trusted × 10 | mint + bonus → reward ≥ 10 |
+| Ramp | < 4000 nodes | trusted × 10 | mint + bonus → allocation ≥ 10 |
 | Decay | > 4000 nodes | 40k (ceiling) | per-node mint shrinks (40k/nodes) + bonus |
 | Post-cap | 40M minted | **0** | bonus only (recycle + revenue) |
 
-After the cap, an active + revenue-generating network keeps paying rewards; a dead one with no revenue dries up to zero. Team gets 5% in every phase.
+After the cap, an active + revenue-generating network keeps filling the daily pool; a dead one with no revenue dries up to zero. Team gets 5% in every phase.
 
 ## 10. Parameters
 

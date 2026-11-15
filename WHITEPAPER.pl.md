@@ -11,7 +11,7 @@
 
 ## Streszczenie
 
-Wielkie firmy mierzą autostrady i centra miast. Prawie nikt nie mierzy *Twojej* ulicy — jakości jej prądu, zasięgu, powietrza. Sensmos zamienia tani ESP32 w noda, który mierzy realny świat lokalnie, publikuje na wspólnej żywej mapie, może handlować danymi peer-to-peer i zarabia **GALU** za prawdziwy, poświadczony wkład. Te same nody tworzą też siatkę pomiarową: sondują siebie nawzajem i publiczne usługi między krajami (ICMP, TCP, DNS, HTTP), budując żywy obraz zdrowia internetu widziany **z realnych domów, nie z centrów danych** — drugą, sieciową płaszczyznę tej samej tkanki. Urządzenie nie zależy od chmury, tożsamość powstaje na układzie, a ekonomia nagród jest **fizycznie pokryta** on-chain: każda jednostka nagrody ma pokrycie w tokenach realnie trzymanych w kontrakcie — żadnej wirtualnej rezerwy. Ten dokument opisuje sieć, jej architekturę, model anty-sybil i ekonomię emisji GALU dokładnie tak, jak są wdrożone.
+Wielkie firmy mierzą autostrady i centra miast. Prawie nikt nie mierzy *Twojej* ulicy — jakości jej prądu, zasięgu, powietrza. Sensmos zamienia tani ESP32 w noda, który mierzy realny świat lokalnie, publikuje na wspólnej żywej mapie, może handlować danymi peer-to-peer i otrzymuje **GALU**, token użytkowy sieci, za prawdziwy, poświadczony wkład. Te same nody tworzą też siatkę pomiarową: sondują siebie nawzajem i publiczne usługi między krajami (ICMP, TCP, DNS, HTTP), budując żywy obraz zdrowia internetu widziany **z realnych domów, nie z centrów danych** — drugą, sieciową płaszczyznę tej samej tkanki. Urządzenie nie zależy od chmury, tożsamość powstaje na układzie, a ekonomia GALU jest **fizycznie pokryta** on-chain: każda przydzielona jednostka ma pokrycie w tokenach realnie trzymanych w kontrakcie — żadnej wirtualnej rezerwy. Ten dokument opisuje sieć, jej architekturę, model anty-sybil i ekonomię emisji GALU dokładnie tak, jak są wdrożone.
 
 ---
 
@@ -23,7 +23,7 @@ Sensmos zamyka trzy luki naraz:
 
 1. **Tkanka** — żywa, publiczna mapa, gdzie publiczne odczyty każdego noda składają się na wspólny obraz okolicy.
 2. **Motywacja** — token nagradzający uptime i *rzadkość pokrycia* (mierzenie tam, gdzie nikt inny), a nie spekulację.
-3. **Dowód fizyczności** — ceremonia atestacji urządzenia, by jedna tożsamość nagrodowa = jeden realny node, nie farma symulatorów.
+3. **Dowód fizyczności** — ceremonia atestacji urządzenia, by jedna tożsamość w podziale GALU = jeden realny node, nie farma symulatorów.
 
 ---
 
@@ -62,7 +62,7 @@ ESP32 node ──podpisany batch──▶ Backend ──▶ PostgreSQL
 ```
 
 - **Firmware (Arduino-ESP32).** Czyta czujniki, ma **silnik skryptów na brzegu** — reguły do 4 kroków (`if → akcja`: webhook, push, fetch z web, ping/monitor, wiadomość do innego noda) działające lokalnie, bez chmury. Wystawia lokalne HTTP API w sieci LAN.
-- **Backend (Node.js · PostgreSQL · ethers v6).** Przyjmuje podpisane batche przez WebSocket, liczy dobową *epokę* (scoring + pula nagród + Merkle), serwuje mapę/ranking/statystyki i wysyła rooty on-chain.
+- **Backend (Node.js · PostgreSQL · ethers v6).** Przyjmuje podpisane batche przez WebSocket, liczy dobową *epokę* (scoring + pula dzienna + Merkle), serwuje mapę/ranking/statystyki i wysyła rooty on-chain.
 - **Apka mobilna (Flutter).** Portfel self-custody, onboarding noda przez BLE, żywa mapa, claim/deposit.
 - **Integracja Home Assistant (HACS).** Wnosi dane noda do HA i karmi noda danymi z HA — w pełni lokalnie, bez brokera.
 
@@ -74,9 +74,9 @@ ESP32 node ──podpisany batch──▶ Backend ──▶ PostgreSQL
 - **Geolokalizacja app-proof.** Pozycja noda jest ustawiana wyłącznie z GPS telefonu zebranego **wewnątrz ceremonii atestacji** (kotwica dowodu), opcjonalnie rozmywana 200–800 m dla prywatności; czytelne miasto liczy serwer. Deklarowana pozycja jest dodatkowo **krzyżowo sprawdzana z punktem wyjścia noda do sieci** (kraj i odległość geo-IP) — GPS niespójny z tym, skąd node faktycznie się łączy, jest odrzucany. Pozycji nie da się wpisać ręcznie.
 - **Atestacja urządzenia.** Ceremonia przez Bluetooth z rundami czasowymi i podwójnym podpisem dowodzi `1 device_id = 1 fizyczny node`, zabijając farmy symulatorów. **Tylko poświadczone („trusted") nody liczą się do emisji.**
 - **Podpisana płaszczyzna sterowania.** Komendy backend→node (restart, kasacja, aktualizacja) są podpisane kluczem sieci nad jednorazowym nonce, a firmware przychodzi podpisanym OTA: node weryfikuje SHA-256 i podpis przed flashem, a nieudana aktualizacja sama cofa się do poprzedniego obrazu.
-- **Cap wspólnego łącza.** Waga nagrody zawiera czynnik zależny od **publicznego IP wyjściowego** noda: dwa nody za jednym łączem zachowują ~0,95 każdy, a czynnik łagodnie maleje, im więcej nodów dzieli to samo IP. Co kluczowe, opiera się on na twardych faktach sieciowych, **nie na portfelu** — zakładanie nowych portfeli go nie resetuje. Razem z geograficzną rzadkością (§5) czyni to farmę stłoczonych nodów nieopłacalną, nie ruszając prawdziwych domów z kilkoma nodami.
+- **Cap wspólnego łącza.** Waga przydziału zawiera czynnik zależny od **publicznego IP wyjściowego** noda: dwa nody za jednym łączem zachowują ~0,95 każdy, a czynnik łagodnie maleje, im więcej nodów dzieli to samo IP. Co kluczowe, opiera się on na twardych faktach sieciowych, **nie na portfelu** — zakładanie nowych portfeli go nie resetuje. Razem z geograficzną rzadkością (§5) czyni to farmę stłoczonych nodów nieopłacalną, nie ruszając prawdziwych domów z kilkoma nodami.
 
-Razem czyni to fałszowanie kosztownym: żeby udawać nagrody, potrzebujesz realnego sprzętu, realnego klucza, realnego telefonu w realnej lokalizacji, przechodzącego challenge w czasie rzeczywistym — a każde kolejne stłoczone urządzenie zarabia wyraźnie mniej.
+Razem czyni to fałszowanie kosztownym: żeby udawać przydziały, potrzebujesz realnego sprzętu, realnego klucza, realnego telefonu w realnej lokalizacji, przechodzącego challenge w czasie rzeczywistym — a każde kolejne stłoczone urządzenie zarabia wyraźnie mniej.
 
 ---
 
@@ -98,10 +98,10 @@ release    = RELEASE_RATE × reserve                             ← dolewka, ma
 burn       = BURN_RATE × release                                ← deflacja
 pula       = fresh_mint + (release − burn)
 team       = TEAM_FEE × pula                                    ← Model B (w drzewie Merkle)
-reward_i   = (pula − team) × waga_i / Σwag                      ← udział; może przekroczyć BASE
+udział_i   = (pula − team) × waga_i / Σwag                      ← udział; może przekroczyć BASE
 ```
 
-Nagroda noda to **udział w puli wg wagi** — lepiej położony, z wyższym uptime bierze większy kawałek kosztem słabszych, a nie przez dodruk nowych tokenów.
+Przydział noda to **udział w puli wg wagi** — lepiej położony, z wyższym uptime bierze większy kawałek kosztem słabszych, a nie przez dodruk nowych tokenów.
 
 Czynniki wagi, dokładnie jak wdrożone:
 
@@ -120,19 +120,19 @@ Maksimum ≈ 2,14× (pełny uptime, jedyny node na łączu); node stłoczony w z
 | **recycle** | wydatki w sieci (query, subskrypcje, wiadomości) wracające do puli | nie |
 | **external** (`fundPool`) | przychód z płatnych usług (np. dane, monitoring) przeniesiony do puli jako istniejące GALU | **nie** |
 
-Recycle i external lądują w jednej **rezerwie**; tylko ~5% dolewane jest do nagród co epokę, wygładzając skoki. Jedyne wyjście to **claim**.
+Recycle i external lądują w jednej **rezerwie**; tylko ~5% dolewane jest do puli dziennej co epokę, wygładzając skoki. Jedyne wyjście to **claim**.
 
 ### Wypłaty cumulative
-Nagrody rozdawane są jako **cumulative Merkle drop**: root koduje *lifetime* entitlement adresu, kontrakt śledzi ile już odebrano i wypłaca różnicę. Jedna transakcja odbiera całą zaległość, podwójne claimy są niemożliwe z konstrukcji, a pominięty submit on-chain leczy się sam w kolejnej epoce.
+Przydziały rozdawane są jako **cumulative Merkle drop**: root koduje *lifetime* entitlement adresu, kontrakt śledzi ile już odebrano i wypłaca różnicę. Jedna transakcja odbiera całą zaległość, podwójne claimy są niemożliwe z konstrukcji, a pominięty submit on-chain leczy się sam w kolejnej epoce.
 
 ### Cykl życia
-| Faza | Warunek | Źródło nagród |
+| Faza | Warunek | Źródło puli |
 |------|---------|---------------|
 | Rampa | < THRESHOLD nodów | głównie świeży mint |
 | Decay | > THRESHOLD nodów | mint (capnięty) + dolewka |
 | Post-cap | wymintowany hard cap | recycle + **przychód (fundPool)** |
 
-Po cap nie ma nowej emisji. Aktywna sieć dalej płaci nagrody z GALU wydanych na jej usługi i z przychodu przeniesionego do puli przez `fundPool`. Sieć, z której nikt nie korzysta, po prostu schnie do zera.
+Po cap nie ma nowej emisji. Aktywna sieć dalej zasila pulę dzienną z GALU wydanych na jej usługi i z przychodu przeniesionego do puli przez `fundPool`. Sieć, z której nikt nie korzysta, po prostu schnie do zera.
 
 ---
 
@@ -143,7 +143,7 @@ Po cap nie ma nowej emisji. Aktywna sieć dalej płaci nagrody z GALU wydanych n
 | Token | GALU, ERC-20 na Polygonie | kontrakt |
 | Hard cap (`MAX_SUPPLY`) | **40 000 000** | stała kontraktu, niezmienna |
 | Sufit mintu/epokę (`MAX_EPOCH_MINT`) | **40 000** | stała kontraktu |
-| Bazowa nagroda | 10 GALU / node / epokę | konfig. BE |
+| Bazowy przydział | 10 GALU / node / epokę | konfig. BE |
 | Próg decay | 4 000 nodów | konfig. BE |
 | Dolewka z rezerwy (`RELEASE_RATE`) | 5% / epokę | konfig. BE |
 | Burn (`BURN_RATE`) | 10% dolewki | konfig. BE |
@@ -184,7 +184,7 @@ Czym GALU **nie jest**: operator nie sprzedaje GALU, nie prowadzi giełdy, nie o
 
 **Role.** *Minter* (gorący klucz operacyjny, którym podpisuje backend) jest osobny od *ownera* (zimny klucz, który może pauzować i wymieniać mintera, docelowo multisig + timelock).
 
-**Uczciwy model zaufania.** Jak każdy system merkle-reward / airdrop, kontrakt sam nie zweryfikuje, że opublikowany root jest „uczciwy" — egzekwuje wypłacalność i rate-limity, ale treść roota jest zaufana minterowi. To standardowa postawa na starcie. Ścieżka utwardzania: owner → multisig + timelock, publiczne dane nagród do weryfikacji przez społeczność, monitoring off-chain z pauzą jako bezpiecznikiem, segregacja depozytów userów, a docelowo dowody optymistyczne (challengeable) lub zero-knowledge poprawności wyliczenia — w miarę wzrostu wartości.
+**Uczciwy model zaufania.** Jak każdy system podziału przez Merkle / airdrop, kontrakt sam nie zweryfikuje, że opublikowany root jest „uczciwy" — egzekwuje wypłacalność i rate-limity, ale treść roota jest zaufana minterowi. To standardowa postawa na starcie. Ścieżka utwardzania: owner → multisig + timelock, publiczne dane nagród do weryfikacji przez społeczność, monitoring off-chain z pauzą jako bezpiecznikiem, segregacja depozytów userów, a docelowo dowody optymistyczne (challengeable) lub zero-knowledge poprawności wyliczenia — w miarę wzrostu wartości.
 
 ---
 
@@ -204,8 +204,8 @@ Czym GALU **nie jest**: operator nie sprzedaje GALU, nie prowadzi giełdy, nie o
 1. **Live (teraz).** Kontrakt wdrożony i zweryfikowany na Polygonie; dobowe epoki mintują i publikują cumulative rooty; firmware, apka, integracja HA i dokumentacja protokołu open-source. Ambientowa siatka pomiarowa (node↔node ICMP + sondy TCP/DNS/HTTP) działa na całej flocie i zasila żywą mapę.
 2. **Wzrost.** Onboarding realnych nodów, utwardzenie strony popytowej (marketplace danych / przychód → `fundPool`), dopieszczenie UX konsumenckiego.
 3. **Network intelligence (w budowie — „Sensmos Watch").** Zamiana siatki pomiarowej w produkt: **monitoring kierowany** — obserwuj *własny* serwer z wielu krajów naraz (uptime, TTFB, odpowiedzi DNS, alerty push/webhook/e-mail, publiczne strony statusu). Silnik monitoringu kierowanego (przydziały per region, kworum redundancji, rollupy per kraj, alerty) działa już produkcyjnie; powstaje opakowanie produktowe. Przychód od klientów zasila pulę przez `fundPool` (§5) i jest dystrybuowany do **wszystkich** nodów standardowymi wagami epoki — rzadkość vantage wycenia już drabina scarcity, więc nie ma wypłat per sonda, których dałoby się farmić. Otwarcie na klientów zewnętrznych jest twardo bramkowane dwoma zabezpieczeniami: kryptograficznie **podpisane joby sond** (node wykonuje tylko to, co podpisał backend) oraz **weryfikacja własności celu** — sieć sonduje wyłącznie to, czego kontrolę klient udowodni.
-4. **Utwardzenie zaufania.** Owner → multisig + timelock, audyt zewnętrzny, publiczne zbiory danych nagród + monitoring.
-5. **Weryfikowalność.** Przesunięcie oracle nagród z „zaufanego" ku „challengeable / dowodliwemu", gdy sieć urośnie.
+4. **Utwardzenie zaufania.** Owner → multisig + timelock, audyt zewnętrzny, publiczne zbiory danych przydziałów + monitoring.
+5. **Weryfikowalność.** Przesunięcie oracle przydziałów z „zaufanego" ku „challengeable / dowodliwemu", gdy sieć urośnie.
 
 ---
 

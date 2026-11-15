@@ -24,7 +24,7 @@ Contract: [`SensmosRewardPool.sol`](SensmosRewardPool.sol) · deployed on **Poly
 | **recycle** | in-network spending (query / subscription / message) | no | into the reserve → 5% drip |
 | **external** (`fundPool`) | revenue from paid services → existing GALU moved into the pool | **no** | into the reserve → 5% drip |
 
-Outflows: **claim** (reward withdrawal) and **deposit** (a user adds their own GALU to spend in the network).
+Outflows: **claim** (withdrawal of allocated GALU to a wallet) and **deposit** (a user adds their own GALU to spend in the network).
 
 > recycle and external land in one **reserve**. The drip is 5% of that reserve per epoch — this smooths spikes: a large one-off data sale isn't paid out in a single epoch, it trickles at ~5%/epoch. recycle is a re-allocation (GALU spent by a node never leaves the contract); external is a real inflow via `fundPool`.
 
@@ -70,10 +70,10 @@ external_used = release − recycled_used
 # split — Model B: team gets 5% of the POOL, nodes share the rest by weight
 team      = floor(pool × TEAM_FEE)
 node_pool = pool − team
-reward_i  = floor(node_pool × weight_i / Σweights)  # may exceed BASE (bonus)
-dust      = node_pool − Σreward_i                   # stays physically in the pool
+share_i   = floor(node_pool × weight_i / Σweights)  # may exceed BASE (bonus)
+dust      = node_pool − Σshare_i                    # stays physically in the pool
 
-entitlement_i (lifetime) += reward_i;  team += its 5%
+entitlement_i (lifetime) += share_i;  team += its 5%
 totalEntitlement = Σ all lifetimes                  # → guard in the contract
 ```
 
@@ -118,13 +118,13 @@ mass:            balanceOf ≥ Σ(leaf_i − claimedTotal_i)              # cove
 
 ## 9. Phases
 
-| Phase | Condition | fresh_mint | Pool / reward |
+| Phase | Condition | fresh_mint | Pool / allocation |
 |-------|-----------|-----------|---------------|
-| Ramp | trusted < 4000 | trusted × BASE | mint + drip (reward ≥ BASE) |
+| Ramp | trusted < 4000 | trusted × BASE | mint + drip (allocation ≥ BASE) |
 | Decay | trusted > 4000 | 40k (ceiling) | mint + drip (per-node shrinks: 40k/nodes + bonus) |
 | Post-cap | minted = 40M | **0** | drip only (recycle + external) |
 
-After the cap, the network lives on recycle and `fundPool` revenue, with no new issuance. A network nobody uses → rewards → 0.
+After the cap, the network lives on recycle and `fundPool` revenue, with no new issuance. A network nobody uses → allocations → 0.
 
 ## 10. Anti-sybil
 

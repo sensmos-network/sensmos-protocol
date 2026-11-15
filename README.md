@@ -2,13 +2,13 @@
 
 # Sensmos — Protocol
 
-The **GALU** token, the on-chain reward pool, and the economic model behind the **Sensmos** DePIN sensor network.
+The **GALU** token, the on-chain pool, and the economic model behind the **Sensmos** DePIN sensor network.
 
-> Sensmos is a decentralized network of cheap ESP32 sensor nodes that measure the real world, publish to a live map, trade data peer-to-peer, and earn GALU for real contribution. The same nodes form a measurement mesh (ICMP/TCP/DNS/HTTP probes across countries) — a live picture of internet health seen from real homes, not datacenters. This repository is the public, on-chain part: the token/reward contract and how emission works.
+> Sensmos is a decentralized network of cheap ESP32 sensor nodes that measure the real world, publish to a live map, trade data peer-to-peer, and receive GALU, the network's utility token, for the resources they share. The same nodes form a measurement mesh (ICMP/TCP/DNS/HTTP probes across countries) — a live picture of internet health seen from real homes, not datacenters. This repository is the public, on-chain part: the token/reward contract and how emission works.
 
 ## The contract
 
-`SensmosRewardPool` is GALU (ERC-20) **and** the reward pool in a single contract — all "in-network" GALU (unclaimed rewards, deposits, revenue funding) physically lives there. Rewards are distributed via a **cumulative Merkle drop**, and solvency is enforced on-chain: a claim can never pay out more than the pool holds.
+`SensmosRewardPool` is GALU (ERC-20) **and** the distribution pool in a single contract — all "in-network" GALU (unclaimed allocations, deposits, revenue funding) physically lives there. Allocations are distributed via a **cumulative Merkle drop**, and solvency is enforced on-chain: a claim can never pay out more than the pool holds.
 
 - Source: [`SensmosRewardPool.sol`](SensmosRewardPool.sol)
 - Network: **Polygon**
