@@ -77,6 +77,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | `fwd_resp` | `fw_digest.cpp:110` | `fw_digest.onResponse` | `nonce`,`fw`,`chip`,`ok` |
 | `ws_outage` | `ws_client.cpp:272` | `onWsOutage` | `start_epoch`,`ff_epoch`,… |
 | `wifi_env` | `wifi_env.cpp:64` | `onWifiEnv` | `n[]` (hashe sieci) |
+| `lorawan_claim` | Hub `src/lorawan.js` (0.2.0-beta7) | `lorawan.onClaim` | `devaddrs[]` (DevAddr ABP właściciela, max 20; tylko Hub) |
 
 ### 2.1 Niezgodności znalezione przy spisie
 
@@ -111,6 +112,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | `lora_listen`, `lora_cad`, `lora_hunt`, `lora_bg` | `lora.js:754-762` (`requestJob`) | `on_lora_*` |
 | `lora_msg_seed` | `messaging.js` | `on_lora_msg_seed` |
 | `lora_tx` | `ldev.js`, `messaging.js` | `on_lora_tx` |
+| `lorawan_claimed`, `lorawan_frame` | `ws_handlers.js`, `lorawan.js` | Hub: `lorawan.onWs` (uplink LoRaWAN z eteru: `hex`, `freq`, `sf`, `rssi`, `snr`, `ts`, `rx`) |
 
 ## 4. Kierunek po przebudowie
 

@@ -32,5 +32,6 @@
   "fwd_resp": { "nonce": "string", "fw": "string", "chip": "string", "ok": "boolean", "d?": "string", "us?": "number" },
   "ws_outage": { "start_epoch": "number", "ff_epoch": "number", "probes_fail": "number", "probes_ok": "number", "restarts": "number" },
   "wifi_env": { "n": "array" },
-  "logs": { "lines": "array", "req?": "string", "uptime_s?": "number", "heap?": "number", "blk?": "number", "min?": "number", "rst?": "number", "dropped?": "number" }
+  "logs": { "lines": "array", "req?": "string", "uptime_s?": "number", "heap?": "number", "blk?": "number", "min?": "number", "rst?": "number", "dropped?": "number" },
+  "lorawan_claim": { "devaddrs": "array" }
 }
