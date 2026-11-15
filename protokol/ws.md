@@ -78,6 +78,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | `ws_outage` | `ws_client.cpp:272` | `onWsOutage` | `start_epoch`,`ff_epoch`,… |
 | `wifi_env` | `wifi_env.cpp:64` | `onWifiEnv` | `n[]` (hashe sieci) |
 | `lorawan_claim` | Hub `src/lorawan.js` (0.2.0-beta7) | `lorawan.onClaim` | `devaddrs[]` (DevAddr ABP właściciela, max 20; tylko Hub) |
+| `esphome_claim` | Hub `src/esphome_lora.js` (0.2.0-beta7) | `esphome.onClaim` | `names[]` (nazwy płytek ESPHome właściciela, `esphome: name`, max 20; tylko Hub) |
 
 ### 2.1 Niezgodności znalezione przy spisie
 
@@ -113,6 +114,7 @@ Legacy bez szyfrowania (FW < 0.61: K3, nonce komend, `sendSignedCommand`) — do
 | `lora_msg_seed` | `messaging.js` | `on_lora_msg_seed` |
 | `lora_tx` | `ldev.js`, `messaging.js` | `on_lora_tx` |
 | `lorawan_claimed`, `lorawan_frame` | `ws_handlers.js`, `lorawan.js` | Hub: `lorawan.onWs` (uplink LoRaWAN z eteru: `hex`, `freq`, `sf`, `rssi`, `snr`, `ts`, `rx`) |
+| `esphome_claimed`, `esphome_frame` | `ws_handlers.js`, `esphome.js` | Hub: `esphome.onWs` (ramka packet_transport z eteru: `hex`, `rssi`, `snr`, `ts`, `rx`; treść XXTEA, BE bez klucza) |
 
 ## 4. Kierunek po przebudowie
 
