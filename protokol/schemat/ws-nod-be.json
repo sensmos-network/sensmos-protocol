@@ -34,5 +34,6 @@
   "wifi_env": { "n": "array" },
   "logs": { "lines": "array", "req?": "string", "uptime_s?": "number", "heap?": "number", "blk?": "number", "min?": "number", "rst?": "number", "dropped?": "number" },
   "lorawan_claim": { "devaddrs": "array" },
-  "esphome_claim": { "names": "array" }
+  "esphome_claim": { "names": "array" },
+  "attest_res": { "rid": "string", "attest?": "string", "sig?": "string", "error?": "string" }
 }
